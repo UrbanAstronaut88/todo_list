@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load crispy_forms_filters %}
+
+{% block title %}{{ form.instance.pk|yesno:"Update task,Add task" }}{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">{{ form.instance.pk|yesno:"Updating a task,Creating a new task" }}</h1>
+
+<form method="post" class="card p-4 shadow-sm">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-outline-success btn-sm">Save</button>
+      <a href="{% url 'todo:task-list' %}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Todo List{% endblock %}</title>
+
+    <!-- B o o t s t r a p   C S S -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- s t y l e s -->
+    <link href="{% static 'todo/style.css' %}" rel="stylesheet" />
+</head>
+<body>
+    <nav class="sidebar">
+        <h4>TODO list<h4>
+        <a href="{% url 'todo:task-list' %}" class="{% if request.resolver_match.url_name == 'task-list' %}active{% endif %}">Main(Tasks)</a>
+        <a href="{% url 'todo:tag-list' %}" class="{% if request.resolver_match.url_name == 'tag-list' %}active{% endif %}">Tags</a>
+    </nav>
+
+    <main class="content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- B o o t s t r a p  J S  +  P o p p e r -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
