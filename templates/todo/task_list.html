@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Task list{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Task list</h1>
+
+<a href="{% url 'todo:task-create' %}" class="btn btn-outline-success mb-3">➕ Add a task</a>
+
+{% if tasks %}
+  <div class="row row-cols-1 g-4">
+    {% for task in tasks %}
+      <div class="col">
+        <div class="card {% if task.is_done %}border-success{% else %}border-primary{% endif %}">
+          <div class="card-body">
+            <h5 class="card-title {% if task.is_done %}text-decoration-line-through text-success{% endif %}">
+              {{ task.content }}
+            </h5>
+            <p class="card-text">
+              <strong>Created:</strong> {{ task.created|date:"Y-m-d H:i" }}<br>
+              {% if task.deadline %}<strong>Deadline:</strong> {{ task.deadline|date:"Y-m-d H:i" }}<br>{% endif %}
+              <strong>Tags:</strong>
+              {% for tag in task.tags.all %}
+                <span class="badge bg-secondary">{{ tag.name }}</span>
+              {% empty %}
+                <span class="text-muted">—</span>
+              {% endfor %}
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+              <a href="{% url 'todo:toggle-complete' task.pk %}" class="btn {% if task.is_done %}btn-warning{% else %}btn-success{% endif %} btn-sm">
+                {% if task.is_done %}Cancel{% else %}Completed{% endif %}
+              </a>
+              <a href="{% url 'todo:task-update' task.pk %}" class="btn btn-outline-primary btn-sm">Update</a>
+              <a href="{% url 'todo:task-delete' task.pk %}" class="btn btn-outline-danger btn-sm">Delete</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="text-muted">No tasks</p>
+{% endif %}
+{% endblock %}

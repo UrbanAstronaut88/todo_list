@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Tag list{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Tag list</h1>
+
+<a href="{% url 'todo:tag-create' %}" class="btn btn-outline-success mb-3">➕ Add a tag</a>
+
+{% if tags %}
+  <table class="table table-bordered table-hover">
+    <thead class="table-light">
+      <tr>
+        <th>Name</th>
+        <th class="text-center" style="width: 200px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tag in tags %}
+        <tr>
+          <td>{{ tag.name }}</td>
+          <td class="text-center">
+            <a href="{% url 'todo:tag-update' tag.pk %}" class="btn btn-outline-primary btn-sm">Update</a>
+            <a href="{% url 'todo:tag-delete' tag.pk %}" class="btn btn-outline-danger btn-sm">Delete</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p class="text-muted">No tags yet</p>
+{% endif %}
+{% endblock %}
