@@ -27,9 +27,12 @@
               {% endfor %}
             </p>
             <div class="d-flex flex-wrap gap-2">
-              <a href="{% url 'todo:toggle-complete' task.pk %}" class="btn {% if task.is_done %}btn-warning{% else %}btn-success{% endif %} btn-sm">
-                {% if task.is_done %}Cancel{% else %}Completed{% endif %}
-              </a>
+              <form action="{% url 'todo:toggle-complete' task.pk %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn {% if task.is_done %}btn-warning{% else %}btn-success{% endif %} btn-sm">
+                  {% if task.is_done %}Cancel{% else %}Completed{% endif %}
+                </button>
+              </form>
               <a href="{% url 'todo:task-update' task.pk %}" class="btn btn-outline-primary btn-sm">Update</a>
               <a href="{% url 'todo:task-delete' task.pk %}" class="btn btn-outline-danger btn-sm">Delete</a>
             </div>
