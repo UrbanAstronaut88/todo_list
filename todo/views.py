@@ -1,84 +1,83 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from todo.forms import TaskForm, TagForm
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse_lazy
+from django.views import View
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from todo.models import Task, Tag
+from todo.forms import TaskForm, TagForm
 
 
-# T a s k   C R U D
-def task_list(request):
-    tasks = Task.objects.all().order_by("is_done", "-created")
-    return render(request, "todo/task_list.html", {"tasks": tasks})
+# T A S K   C R U D
+
+class TaskListView(ListView):
+    model = Task
+    template_name = "todo/task_list.html"
+    context_object_name = "tasks"
+
+    def get_queryset(self):
+        return Task.objects.all().order_by("is_done", "-created")
 
 
-def task_create(request):
-    if request.method == "POST":
-        form = TaskForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("todo:task_list")
-    else:
-        form = TaskForm()
-    return render(request, "todo/task_form.html", {"form": form, "title": "Add Task"})
+class TaskCreateView(CreateView):
+    model = Task
+    form_class = TaskForm
+    template_name = "todo/task_form.html"
+    success_url = reverse_lazy("todo:task-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Add Task"
+        return context
 
 
-def task_update(request, pk):
-    task = get_object_or_404(Task, pk=pk)
-    if request.method == "POST":
-        form = TaskForm(request.POST, instance=task)
-        if form.is_valid():
-            form.save()
-            return redirect("todo:task-list")
-    else:
-        form = TaskForm(instance=task)
-    return render(request, "todo/task_form.html", {"form": form, "title": "Edit"})
+class TaskUpdateView(UpdateView):
+    model = Task
+    form_class = TaskForm
+    template_name = "todo/task_form.html"
+    success_url = reverse_lazy("todo:task-list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Edit"
+        return context
 
 
-def task_delete(request, pk):
-    task = get_object_or_404(Task, pk=pk)
-    if request.method == "POST":
-        task.delete()
+class TaskDeleteView(DeleteView):
+    model = Task
+    template_name = "todo/task_confirm_delete.html"
+    success_url = reverse_lazy("todo:task-list")
+
+
+class ToggleCompleteView(View):
+    def post(self, request, pk):
+        task = get_object_or_404(Task, pk=pk)
+        task.is_done = not task.is_done
+        task.save()
         return redirect("todo:task-list")
-    return render(request, "todo/task_confirm_delete.html", {"task": task})
 
 
-def toggle_complete(request, pk):
-    task = get_object_or_404(Task, pk=pk)
-    task.is_done = not task.is_done
-    task.save()
-    return redirect("todo:task-list")
+# T A G   C R U D
+
+class TagListView(ListView):
+    model = Tag
+    template_name = "todo/tag_list.html"
+    context_object_name = "tags"
 
 
-# T A G  C R U D
-def tag_list(request):
-    tags = Tag.objects.all()
-    return render(request, "todo/tag_list.html", {"tags": tags})
+class TagCreateView(CreateView):
+    model = Tag
+    form_class = TagForm
+    template_name = "todo/tag_form.html"
+    success_url = reverse_lazy("todo:tag-list")
 
 
-def tag_create(request):
-    if request.method == "POST":
-        form = TagForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("todo:tag-list")
-    else:
-        form = TagForm()
-    return render(request, "todo/tag_form.html", {"form": form})
+class TagUpdateView(UpdateView):
+    model = Tag
+    form_class = TagForm
+    template_name = "todo/tag_form.html"
+    success_url = reverse_lazy("todo:tag-list")
 
 
-def tag_update(request, pk):
-    tag = get_object_or_404(Tag, pk=pk)
-    if request.method == "POST":
-        form = TagForm(request.POST, instance=tag)
-        if form.is_valid():
-            form.save()
-            return redirect("todo:tag-list")
-    else:
-        form = TagForm(instance=tag)
-    return render(request, "todo/tag_form.html", {"form": form})
-
-
-def tag_delete(request, pk):
-    tag = get_object_or_404(Tag, pk=pk)
-    if request.method == "POST":
-        tag.delete()
-        return redirect("todo:tag-list")
-    return render(request, "todo/tag_confirm_delete.html", {"tag": tag})
+class TagDeleteView(DeleteView):
+    model = Tag
+    template_name = "todo/tag_confirm_delete.html"
+    success_url = reverse_lazy("todo:tag-list")
